@@ -1,0 +1,16 @@
+{
+  "name": "nasa-api-docs",
+  "version": "1.0.0",
+  "description": "### nasa/api-docs repository contains the front-end for http://api.nasa.gov/. This site is currently CNAME mapped to NASA domain, but in the event the page is down, you can access it through Github Pages here: http://nasa.github.io/api-docs/ .",
+  "main": "generate-openapi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "swagger-parser": "^10.0.3"
+  }
+}
