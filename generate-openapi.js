@@ -5,11 +5,14 @@
  * 
  * This script reads the NASA APIs metadata from apis.json and generates
  * a comprehensive OpenAPI 3.0+ specification covering all available APIs.
+ * It properly parses HTML templates to extract endpoints, parameters, and descriptions.
  */
 
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const cheerio = require('cheerio');
+const axios = require('axios');
 
 // Read and parse the APIs JSON file
 function loadApis() {
@@ -184,37 +187,184 @@ function convertSwagger2ToOpenAPI3(swagger2Data) {
   return { paths, components };
 }
 
-// Extract API endpoints from HTML template
-function extractEndpointsFromHTML(htmlTemplate, apiName) {
-  const paths = {};
+// Test an endpoint to verify it works and get response schema
+async function testEndpoint(url, retries = 1) {
+  try {
+    console.log(`Testing endpoint: ${url}`);
+    const response = await axios.get(url, {
+      timeout: 5000,
+      validateStatus: (status) => status < 500 // Accept 4xx as valid for API key issues
+    });
+    
+    return {
+      status: response.status,
+      data: response.data,
+      headers: response.headers
+    };
+  } catch (error) {
+    if (retries > 0 && (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT')) {
+      console.log(`Retrying endpoint ${url} (${retries} retries left)`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return testEndpoint(url, retries - 1);
+    }
+    
+    console.log(`⚠ Network error testing ${url}: ${error.message}`);
+    return {
+      status: error.response?.status || 500,
+      error: error.message,
+      data: error.response?.data,
+      offline: true
+    };
+  }
+}
+
+// Infer schema from response data
+function inferSchemaFromResponse(data) {
+  if (data === null) return { type: 'null' };
+  if (Array.isArray(data)) {
+    if (data.length > 0) {
+      return {
+        type: 'array',
+        items: inferSchemaFromResponse(data[0])
+      };
+    }
+    return { type: 'array', items: { type: 'object' } };
+  }
   
-  // Common patterns to extract API endpoints
-  const patterns = [
-    // Pattern: GET https://api.nasa.gov/path
-    /GET\s+https:\/\/api\.nasa\.gov([^\s<]+)/gi,
-    // Pattern: https://api.nasa.gov/path in links and code blocks
-    /https:\/\/api\.nasa\.gov([^\s"<>]+)/gi
+  const type = typeof data;
+  if (type === 'object') {
+    const properties = {};
+    Object.keys(data).forEach(key => {
+      properties[key] = inferSchemaFromResponse(data[key]);
+    });
+    return { type: 'object', properties };
+  }
+  
+  if (type === 'string') {
+    // Check if it's a date format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+      return { type: 'string', format: 'date' };
+    }
+    // Check if it's a URI
+    if (/^https?:\/\//.test(data)) {
+      return { type: 'string', format: 'uri' };
+    }
+    return { type: 'string' };
+  }
+  
+  return { type };
+}
+
+// Parse parameter type from HTML table cell
+function parseParameterType(typeText) {
+  const text = typeText.toLowerCase().trim();
+  if (text.includes('yyyy-mm-dd') || text === 'date') {
+    return { type: 'string', format: 'date' };
+  }
+  if (text === 'int' || text === 'integer') {
+    return { type: 'integer' };
+  }
+  if (text === 'bool' || text === 'boolean') {
+    return { type: 'boolean' };
+  }
+  if (text === 'float' || text === 'number') {
+    return { type: 'number' };
+  }
+  return { type: 'string' };
+}
+
+// Extract API endpoints from HTML template using proper parsing
+async function extractEndpointsFromHTML(htmlTemplate, apiName) {
+  console.log(`\nParsing HTML template for ${apiName}`);
+  const $ = cheerio.load(htmlTemplate);
+  const paths = {};
+  const endpoints = [];
+
+  // Extract endpoints from various patterns in the HTML
+  const fullText = $.text();
+  const codeElements = $('code').toArray();
+  
+  // Pattern 1: Direct URLs in text with various parameter formats
+  const urlPatterns = [
+    /GET\s+(https:\/\/api\.nasa\.gov[^\s<\)]+)/gi,
+    /(https:\/\/api\.nasa\.gov[^\s"<>\)\?]+)/gi,
+    /api\.nasa\.gov([^\s"<>\)\?]+)/gi
   ];
 
-  const endpoints = new Set();
-  
-  patterns.forEach(pattern => {
+  // Pattern 2: Special handling for angle bracket parameters
+  const paramPatterns = [
+    /GET\s+https:\/\/api\.nasa\.gov([^\s<]+)\s*<([A-Z][^>]*ID[^>]*|[A-Z][^>]*[A-Z][^>]*)>/gi,
+    /https:\/\/api\.nasa\.gov([^\s<]+)\s*<([A-Z][^>]*ID[^>]*|[A-Z][^>]*[A-Z][^>]*)>/gi
+  ];
+
+  // Extract from code elements first (higher priority)
+  codeElements.forEach(element => {
+    const codeText = $(element).text();
+    
+    // First check for parameterized patterns
+    paramPatterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(codeText)) !== null) {
+        let basePath = match[1];
+        let paramName = match[2].toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        
+        if (basePath && !basePath.includes('DEMO_KEY')) {
+          // Ensure proper path format
+          if (!basePath.startsWith('/')) basePath = '/' + basePath;
+          if (!basePath.endsWith('/')) basePath += '/';
+          
+          const path = basePath + '{' + paramName + '}';
+          endpoints.push({ path, source: 'code', confidence: 'high' });
+        }
+      }
+    });
+    
+    // Then check for regular URL patterns
+    urlPatterns.forEach(pattern => {
+      let match;
+      while ((match = pattern.exec(codeText)) !== null) {
+        let url = match[1] || match[0];
+        if (url && !url.includes('DEMO_KEY') && !url.includes('YOUR_API_KEY')) {
+          if (!url.startsWith('http')) {
+            url = 'https://api.nasa.gov' + (url.startsWith('/') ? url : '/' + url);
+          }
+          const path = url.replace('https://api.nasa.gov', '').split('?')[0];
+          if (path && path !== '/' && !path.includes('.html') && !path.includes('.png') && !path.includes('.jpg')) {
+            // Only add if we haven't already found a parameterized version
+            if (!endpoints.find(e => e.path.startsWith(path.split('/').slice(0, -1).join('/')) && e.path.includes('{'))) {
+              endpoints.push({ path, source: 'code', confidence: 'high' });
+            }
+          }
+        }
+      }
+    });
+  });
+
+  // Extract from full text (lower priority) - only nasa.gov URLs
+  urlPatterns.forEach(pattern => {
     let match;
-    while ((match = pattern.exec(htmlTemplate)) !== null) {
-      let endpoint = match[1];
-      if (endpoint && !endpoint.includes('DEMO_KEY')) {
-        // Clean up the endpoint
-        endpoint = endpoint.split('?')[0]; // Remove query params
-        endpoint = endpoint.replace(/&amp;/g, ''); // Remove HTML entities
-        if (endpoint && endpoint !== '/' && !endpoint.includes('.html') && !endpoint.includes('.png') && !endpoint.includes('.jpg')) {
-          endpoints.add(endpoint);
+    while ((match = pattern.exec(fullText)) !== null) {
+      let url = match[1] || match[0];
+      if (url && !url.includes('DEMO_KEY') && !url.includes('YOUR_API_KEY') && 
+          (url.includes('api.nasa.gov') || url.startsWith('/'))) {
+        if (!url.startsWith('http')) {
+          url = 'https://api.nasa.gov' + (url.startsWith('/') ? url : '/' + url);
+        }
+        const path = url.replace('https://api.nasa.gov', '').split('?')[0];
+        if (path && path !== '/' && !path.includes('.html') && !path.includes('.png') && !path.includes('.jpg') &&
+            path.includes('api.nasa.gov') === false) { // Exclude if it still contains api.nasa.gov (malformed)
+          const existing = endpoints.find(e => e.path === path);
+          if (!existing) {
+            endpoints.push({ path, source: 'text', confidence: 'medium' });
+          }
         }
       }
     }
   });
 
-  // Add some known common NASA API patterns based on API names
-  const apiSpecificEndpoints = {
+  // API-specific endpoint patterns (based on common NASA API structures)
+  const apiPatterns = {
+    'APOD': ['/planetary/apod'],
     'Asteroids NeoWs': ['/neo/rest/v1/feed', '/neo/rest/v1/neo/{asteroid_id}', '/neo/rest/v1/neo/browse'],
     'DONKI': ['/DONKI/CME', '/DONKI/CMEAnalysis', '/DONKI/GST', '/DONKI/IPS', '/DONKI/FLR', '/DONKI/SEP', '/DONKI/MPC', '/DONKI/RBE', '/DONKI/HSS', '/DONKI/WSAEnlilSimulations', '/DONKI/notifications'],
     'EPIC': ['/EPIC/api/natural', '/EPIC/api/natural/date/{date}', '/EPIC/api/natural/all', '/EPIC/api/enhanced', '/EPIC/api/enhanced/date/{date}', '/EPIC/api/enhanced/all'],
@@ -222,171 +372,259 @@ function extractEndpointsFromHTML(htmlTemplate, apiName) {
     'Mars Rover Photos': ['/mars-photos/api/v1/rovers/{rover}/photos', '/mars-photos/api/v1/rovers/{rover}/latest_photos', '/mars-photos/api/v1/rovers'],
     'Insight': ['/insight_weather/'],
     'NASA Image and Video Library': ['/search'],
-    'TechTransfer': ['/techtransfer'],
-    'Satellite Situation Center': ['/sscweb/locations', '/sscweb/observatories'],
-    'SSD/CNEOS': ['/ssd/fireball.api', '/ssd/sbdb_query.api'],
-    'Open Science Data Repository': ['/techtransfer'],
+    'TechTransfer': ['/techtransfer/patent/{patent_id}', '/techtransfer/patent', '/techtransfer/software/{software_id}', '/techtransfer/software'],
     'TLE API': ['/tle/{satellite_id}', '/tle'],
     'Exoplanet': ['/exoplanet/exoplanets', '/exoplanet/exomultpars'],
     'GIBS': ['/wmts-webmerc/1.0.0/WMTSCapabilities.xml', '/wmts-geo/1.0.0/WMTSCapabilities.xml']
   };
 
-  if (apiSpecificEndpoints[apiName]) {
-    apiSpecificEndpoints[apiName].forEach(endpoint => endpoints.add(endpoint));
+  // Add known patterns if no endpoints were found
+  if (endpoints.length === 0 && apiPatterns[apiName]) {
+    apiPatterns[apiName].forEach(path => {
+      endpoints.push({ path, source: 'pattern', confidence: 'low' });
+    });
   }
 
-  // Create basic path definitions for extracted endpoints
+  // Deduplicate endpoints
+  const uniqueEndpoints = [];
   endpoints.forEach(endpoint => {
-    if (endpoint && endpoint !== '/') {
-      const pathParams = [];
-      let processedPath = endpoint;
-      
-      // Handle path parameters like {asteroid_id}
-      const paramMatches = endpoint.match(/\{([^}]+)\}/g);
-      if (paramMatches) {
-        paramMatches.forEach(match => {
-          const paramName = match.slice(1, -1);
-          pathParams.push({
-            name: paramName,
-            in: 'path',
-            description: `The ${paramName} parameter`,
-            required: true,
-            schema: {
-              type: 'string'
-            }
-          });
-        });
-      }
+    if (!uniqueEndpoints.find(e => e.path === endpoint.path)) {
+      uniqueEndpoints.push(endpoint);
+    }
+  });
 
-      const parameters = [
-        ...pathParams,
-        {
-          name: 'api_key',
-          in: 'query',
-          description: 'NASA API Key for expanded usage',
-          required: false,
-          schema: {
-            type: 'string',
-            default: 'DEMO_KEY'
+  console.log(`Found ${uniqueEndpoints.length} potential endpoints for ${apiName}:`);
+  uniqueEndpoints.forEach(ep => console.log(`  ${ep.path} (${ep.confidence} confidence from ${ep.source})`));
+
+  // Extract parameter tables
+  const parametersByContext = {};
+  const tables = $('table').toArray();
+
+  tables.forEach((table, tableIndex) => {
+    const $table = $(table);
+    const headers = $table.find('thead tr th, tr:first-child th, tr:first-child td').toArray()
+      .map(th => $(th).text().trim().toLowerCase());
+    
+    if (headers.some(h => h.includes('parameter')) && headers.some(h => h.includes('type') || h.includes('description'))) {
+      console.log(`Found parameter table ${tableIndex + 1} with headers: ${headers.join(', ')}`);
+      
+      const rows = $table.find('tbody tr, tr').toArray().slice(headers.includes('parameter') ? 1 : 0);
+      const parameters = [];
+      
+      rows.forEach(row => {
+        const cells = $(row).find('td, th').toArray();
+        if (cells.length >= 2) {
+          const paramName = $(cells[0]).text().trim();
+          const paramType = cells[1] ? $(cells[1]).text().trim() : '';
+          const paramDefault = cells[2] ? $(cells[2]).text().trim() : '';
+          const paramDesc = cells[3] ? $(cells[3]).text().trim() : 
+                           cells[2] ? $(cells[2]).text().trim() : '';
+          
+          if (paramName && paramName !== 'Parameter' && paramName !== 'parameter' && paramName.length < 50) {
+            const schema = parseParameterType(paramType);
+            
+            const parameter = {
+              name: paramName,
+              in: paramName === 'api_key' ? 'query' : 
+                  (paramName.includes('_id') || paramName === 'asteroid_id' || paramName === 'rover' || 
+                   paramName === 'satellite_id' || paramName === 'date') ? 'query' : 'query',
+              description: paramDesc || `${paramName} parameter`,
+              required: false,
+              schema: schema
+            };
+            
+            if (paramDefault && paramDefault !== 'none' && paramDefault !== '' && paramDefault !== 'null') {
+              parameter.schema.default = paramDefault;
+            }
+            
+            parameters.push(parameter);
           }
         }
-      ];
+      });
+      
+      // Associate parameters with context
+      const prevHeading = $table.prevAll('h1, h2, h3, h4').first().text().trim();
+      const nextHeading = $table.nextAll('h1, h2, h3, h4').first().text().trim();
+      const context = prevHeading || nextHeading || `table_${tableIndex}`;
+      parametersByContext[context] = parameters;
+    }
+  });
 
-      // Add API-specific parameters
-      if (apiName === 'APOD') {
-        parameters.push(
-          {
-            name: 'date',
-            in: 'query',
-            description: 'The date of the APOD image to retrieve (YYYY-MM-DD)',
-            required: false,
-            schema: {
-              type: 'string',
-              format: 'date'
-            }
-          },
-          {
-            name: 'start_date',
-            in: 'query',
-            description: 'The start of a date range (YYYY-MM-DD)',
-            required: false,
-            schema: {
-              type: 'string',
-              format: 'date'
-            }
-          },
-          {
-            name: 'end_date',
-            in: 'query',
-            description: 'The end of the date range (YYYY-MM-DD)',
-            required: false,
-            schema: {
-              type: 'string',
-              format: 'date'
-            }
-          },
-          {
-            name: 'count',
-            in: 'query',
-            description: 'Number of randomly chosen images to return',
-            required: false,
-            schema: {
-              type: 'integer',
-              minimum: 1,
-              maximum: 100
-            }
-          },
-          {
-            name: 'thumbs',
-            in: 'query',
-            description: 'Return the URL of video thumbnail',
-            required: false,
-            schema: {
-              type: 'boolean'
-            }
-          }
-        );
+  // Process each endpoint
+  for (const endpointInfo of uniqueEndpoints) {
+    const { path, confidence } = endpointInfo;
+    
+    // Find the best parameter set for this endpoint
+    let parameters = [];
+    
+    // Try to match parameters by context/heading
+    const pathKeywords = path.toLowerCase().split('/').filter(p => p && !p.includes('{'));
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    Object.keys(parametersByContext).forEach(context => {
+      const contextKeywords = context.toLowerCase().split(/[\s-_]+/);
+      const score = pathKeywords.reduce((acc, keyword) => {
+        return acc + (contextKeywords.some(ck => ck.includes(keyword) || keyword.includes(ck)) ? 1 : 0);
+      }, 0);
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = context;
       }
+    });
+    
+    if (bestMatch && parametersByContext[bestMatch]) {
+      parameters = [...parametersByContext[bestMatch]];
+    } else if (Object.keys(parametersByContext).length > 0) {
+      // Use the first parameter set if no good match
+      parameters = [...Object.values(parametersByContext)[0]];
+    }
 
-      paths[processedPath] = {
-        get: {
-          tags: [apiName],
-          summary: `${apiName} endpoint`,
-          description: `Access ${apiName} data`,
-          parameters: parameters,
-          responses: {
-            '200': {
-              description: 'Successful response',
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    description: `Response data for ${apiName}`
-                  }
-                }
-              }
-            },
-            '400': {
-              description: 'Bad request - invalid parameters',
-              content: {
-                'application/json': {
-                  schema: {
-                    '$ref': '#/components/schemas/Error'
-                  }
-                }
-              }
-            },
-            '403': {
-              description: 'Forbidden - invalid API key',
-              content: {
-                'application/json': {
-                  schema: {
-                    '$ref': '#/components/schemas/Error'
-                  }
-                }
-              }
-            },
-            '429': {
-              description: 'Too many requests - rate limit exceeded',
-              content: {
-                'application/json': {
-                  schema: {
-                    '$ref': '#/components/schemas/Error'
-                  }
-                }
+    // Always ensure api_key parameter
+    if (!parameters.find(p => p.name === 'api_key')) {
+      parameters.push({
+        name: 'api_key',
+        in: 'query',
+        description: 'NASA API Key for expanded usage',
+        required: false,
+        schema: {
+          type: 'string',
+          default: 'DEMO_KEY'
+        }
+      });
+    }
+
+    // Handle path parameters
+    const pathParams = [];
+    const paramMatches = path.match(/\{([^}]+)\}/g);
+    if (paramMatches) {
+      paramMatches.forEach(match => {
+        const paramName = match.slice(1, -1);
+        // Remove from query parameters if it exists
+        parameters = parameters.filter(p => p.name !== paramName);
+        
+        let paramType = 'string';
+        let paramDesc = `The ${paramName} parameter`;
+        
+        // Improve parameter descriptions based on name
+        if (paramName.includes('id')) {
+          paramType = 'string';
+          paramDesc = `The unique identifier for the ${paramName.replace('_id', '').replace('id', '')} resource`;
+        } else if (paramName === 'date') {
+          paramType = 'string';
+          paramDesc = 'Date in YYYY-MM-DD format';
+        } else if (paramName === 'rover') {
+          paramType = 'string';
+          paramDesc = 'Mars rover name (curiosity, opportunity, spirit)';
+        } else if (paramName === 'satellite_id') {
+          paramType = 'string';
+          paramDesc = 'Satellite NORAD catalog number';
+        }
+        
+        pathParams.push({
+          name: paramName,
+          in: 'path',
+          description: paramDesc,
+          required: true,
+          schema: { type: paramType }
+        });
+      });
+    }
+
+    // Generate realistic response schema based on API type
+    let responseSchema = { type: 'object' };
+    if (apiName === 'APOD') {
+      responseSchema = {
+        type: 'object',
+        properties: {
+          date: { type: 'string', format: 'date' },
+          explanation: { type: 'string' },
+          hdurl: { type: 'string', format: 'uri' },
+          media_type: { type: 'string' },
+          service_version: { type: 'string' },
+          title: { type: 'string' },
+          url: { type: 'string', format: 'uri' },
+          copyright: { type: 'string' }
+        }
+      };
+    } else if (apiName === 'Mars Rover Photos') {
+      responseSchema = {
+        type: 'object',
+        properties: {
+          photos: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'integer' },
+                sol: { type: 'integer' },
+                camera: { type: 'object' },
+                img_src: { type: 'string', format: 'uri' },
+                earth_date: { type: 'string', format: 'date' },
+                rover: { type: 'object' }
               }
             }
           }
         }
       };
     }
-  });
 
+    // Extract description from context
+    let description = `Access ${apiName} data`;
+    const headings = $('h1, h2, h3, h4').toArray();
+    for (const heading of headings) {
+      const headingText = $(heading).text().toLowerCase();
+      const pathWords = path.toLowerCase().split('/').filter(p => p && !p.includes('{'));
+      
+      if (pathWords.some(word => headingText.includes(word))) {
+        const nextP = $(heading).nextAll('p').first();
+        if (nextP.length) {
+          description = nextP.text().trim().substring(0, 200) + (nextP.text().length > 200 ? '...' : '');
+          break;
+        }
+      }
+    }
+
+    // Create path definition
+    const pathData = {
+      get: {
+        tags: [apiName],
+        summary: `${apiName} - ${path.split('/').pop() || 'API'}`,
+        description: description,
+        parameters: [...pathParams, ...parameters],
+        responses: {
+          '200': {
+            description: 'Successful response',
+            content: {
+              'application/json': {
+                schema: responseSchema
+              }
+            }
+          },
+          '400': {
+            description: 'Bad request - invalid parameters'
+          },
+          '403': {
+            description: 'Forbidden - invalid API key'
+          },
+          '429': {
+            description: 'Too many requests - rate limit exceeded'
+          }
+        },
+        security: [{ api_key: [] }]
+      }
+    };
+
+    paths[path] = pathData;
+  }
+
+  console.log(`Generated ${Object.keys(paths).length} paths for ${apiName}\n`);
   return paths;
 }
 
 // Generate comprehensive OpenAPI 3.0+ specification
-function generateOpenAPISpec(apis) {
+async function generateOpenAPISpec(apis) {
   const openApiSpec = {
     openapi: '3.0.3',
     info: {
@@ -448,7 +686,7 @@ function generateOpenAPISpec(apis) {
   };
 
   // Process each API
-  apis.forEach(api => {
+  for (const api of apis) {
     // Add tag for this API
     openApiSpec.tags.push({
       name: api.name,
@@ -475,7 +713,7 @@ function generateOpenAPISpec(apis) {
     } else {
       // Extract endpoints from HTML template
       console.log(`Extracting endpoints from HTML template for ${api.name}`);
-      apiPaths = extractEndpointsFromHTML(api.html_template, api.name);
+      apiPaths = await extractEndpointsFromHTML(api.html_template, api.name);
     }
 
     // Add API-specific paths to the main spec
@@ -496,7 +734,7 @@ function generateOpenAPISpec(apis) {
 
       openApiSpec.paths[pathKey] = pathData;
     });
-  });
+  }
 
   return openApiSpec;
 }
@@ -513,14 +751,14 @@ function writeYamlFile(filePath, data) {
 }
 
 // Main execution
-function main() {
+async function main() {
   try {
     console.log('Loading NASA APIs from apis.json...');
     const apis = loadApis();
     console.log(`Found ${apis.length} APIs to process`);
 
     console.log('Generating OpenAPI 3.0+ specification...');
-    const openApiSpec = generateOpenAPISpec(apis);
+    const openApiSpec = await generateOpenAPISpec(apis);
 
     console.log('Converting to YAML format...');
     
@@ -532,6 +770,7 @@ function main() {
     console.log(`Total tags: ${openApiSpec.tags.length}`);
   } catch (error) {
     console.error('Error generating OpenAPI specification:', error.message);
+    console.error(error.stack);
     process.exit(1);
   }
 }

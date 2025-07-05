@@ -99,12 +99,29 @@ paths:
     get:
       tags:
         - Asteroids NeoWs
-      summary: Asteroids NeoWs endpoint
-      description: Access Asteroids NeoWs data
+      summary: Asteroids NeoWs - feed
+      description: >-
+        NeoWs (Near Earth Object Web Service) is a RESTful web service for near earth Asteroid information. With NeoWs a
+        user can: search for Asteroids based on their closest approach date to Earth, lookup a ...
       parameters:
+        - name: start_date
+          in: query
+          description: Starting date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Ending date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+            default: 7 days after start_date
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.nasa.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -116,35 +133,41 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Asteroids NeoWs
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /neo/rest/v1/neo/:
     get:
       tags:
         - Asteroids NeoWs
-      summary: Asteroids NeoWs endpoint
-      description: Access Asteroids NeoWs data
+      summary: Asteroids NeoWs - API
+      description: >-
+        NeoWs (Near Earth Object Web Service) is a RESTful web service for near earth Asteroid information. With NeoWs a
+        user can: search for Asteroids based on their closest approach date to Earth, lookup a ...
       parameters:
+        - name: start_date
+          in: query
+          description: Starting date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Ending date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+            default: 7 days after start_date
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.nasa.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -156,35 +179,87 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Asteroids NeoWs
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
+      security:
+        - api_key: []
+  /neo/rest/v1/neo/3542519:
+    get:
+      tags:
+        - Asteroids NeoWs
+      summary: Asteroids NeoWs - 3542519
+      description: >-
+        NeoWs (Near Earth Object Web Service) is a RESTful web service for near earth Asteroid information. With NeoWs a
+        user can: search for Asteroids based on their closest approach date to Earth, lookup a ...
+      parameters:
+        - name: start_date
+          in: query
+          description: Starting date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Ending date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+            default: 7 days after start_date
+        - name: api_key
+          in: query
+          description: api.nasa.gov key for expanded usage
+          required: false
+          schema:
+            type: string
+            default: DEMO_KEY
+      responses:
+        '200':
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                type: object
+        '400':
+          description: Bad request - invalid parameters
+        '403':
+          description: Forbidden - invalid API key
+        '429':
+          description: Too many requests - rate limit exceeded
+      security:
+        - api_key: []
   /neo/rest/v1/neo/browse/:
     get:
       tags:
         - Asteroids NeoWs
-      summary: Asteroids NeoWs endpoint
-      description: Access Asteroids NeoWs data
+      summary: Asteroids NeoWs - API
+      description: >-
+        NeoWs (Near Earth Object Web Service) is a RESTful web service for near earth Asteroid information. With NeoWs a
+        user can: search for Asteroids based on their closest approach date to Earth, lookup a ...
       parameters:
+        - name: start_date
+          in: query
+          description: Starting date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Ending date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+            default: 7 days after start_date
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.nasa.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -196,81 +271,41 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Asteroids NeoWs
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /neo/rest/v1/neo/{asteroid_id}:
-    get:
-      tags:
-        - Asteroids NeoWs
-      summary: Asteroids NeoWs endpoint
-      description: Access Asteroids NeoWs data
-      parameters:
-        - name: asteroid_id
-          in: path
-          description: The asteroid_id parameter
-          required: true
-          schema:
-            type: string
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Asteroids NeoWs
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /neo/rest/v1/neo/browse:
     get:
       tags:
         - Asteroids NeoWs
-      summary: Asteroids NeoWs endpoint
-      description: Access Asteroids NeoWs data
+      summary: Asteroids NeoWs - browse
+      description: >-
+        NeoWs (Near Earth Object Web Service) is a RESTful web service for near earth Asteroid information. With NeoWs a
+        user can: search for Asteroids based on their closest approach date to Earth, lookup a ...
       parameters:
+        - name: start_date
+          in: query
+          description: Starting date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Ending date for asteroid search
+          required: false
+          schema:
+            type: string
+            format: date
+            default: 7 days after start_date
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.nasa.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -282,31 +317,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Asteroids NeoWs
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/CME:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - CME
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -322,31 +348,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/CMEAnalysis:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - CMEAnalysis
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -362,31 +379,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/GST:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - GST
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -402,31 +410,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/IPS:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - IPS
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -442,31 +441,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/FLR:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - FLR
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -482,31 +472,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/SEP:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - SEP
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -522,31 +503,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/MPC:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - MPC
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -562,31 +534,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/RBE:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - RBE
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -602,31 +565,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/HSS:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - HSS
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -642,31 +596,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/WSAEnlilSimulations:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - WSAEnlilSimulations
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -682,31 +627,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /DONKI/notifications:
     get:
       tags:
         - DONKI
-      summary: DONKI endpoint
-      description: Access DONKI data
+      summary: DONKI - notifications
+      description: >-
+        The Space Weather Database Of Notifications, Knowledge, Information (DONKI) is a comprehensive on-line tool for
+        space weather forecasters, scientists, and the general space science community. DONKI ch...
       parameters:
         - name: api_key
           in: query
@@ -722,30 +658,19 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for DONKI
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /wmts-webmerc/1.0.0/WMTSCapabilities.xml:
     get:
       tags:
         - GIBS
-      summary: GIBS endpoint
+      summary: GIBS - WMTSCapabilities.xml
       description: Access GIBS data
       parameters:
         - name: api_key
@@ -762,30 +687,19 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for GIBS
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /wmts-geo/1.0.0/WMTSCapabilities.xml:
     get:
       tags:
         - GIBS
-      summary: GIBS endpoint
+      summary: GIBS - WMTSCapabilities.xml
       description: Access GIBS data
       parameters:
         - name: api_key
@@ -802,31 +716,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for GIBS
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /EONET/api/v2.1/events:
     get:
       tags:
         - EONET
-      summary: EONET endpoint
-      description: Access EONET data
+      summary: EONET - events
+      description: >-
+        More and more NASA imagery is being made available via web services (WMS, WMTS, etc.) and a significant
+        percentage of it is being produced and published in near real time (NRT=within a few hours after...
       parameters:
         - name: api_key
           in: query
@@ -842,31 +747,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EONET
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /EONET/api/v2.1/categories:
     get:
       tags:
         - EONET
-      summary: EONET endpoint
-      description: Access EONET data
+      summary: EONET - categories
+      description: >-
+        More and more NASA imagery is being made available via web services (WMS, WMTS, etc.) and a significant
+        percentage of it is being produced and published in near real time (NRT=within a few hours after...
       parameters:
         - name: api_key
           in: query
@@ -882,31 +778,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EONET
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /EONET/api/v2.1/layers:
     get:
       tags:
         - EONET
-      summary: EONET endpoint
-      description: Access EONET data
+      summary: EONET - layers
+      description: >-
+        More and more NASA imagery is being made available via web services (WMS, WMTS, etc.) and a significant
+        percentage of it is being produced and published in near real time (NRT=within a few hours after...
       parameters:
         - name: api_key
           in: query
@@ -922,35 +809,84 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EONET
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /EPIC/api/natural:
+      security:
+        - api_key: []
+  /EPIC/api/natural/images:
     get:
       tags:
         - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
+      summary: EPIC - images
+      description: >-
+        The EPIC API provides information on the daily imagery collected by DSCOVR's Earth Polychromatic Imaging Camera
+        (EPIC) instrument. Uniquely positioned at the Earth-Sun Lagrange point, EPIC provides fu...
       parameters:
+        - name: natural
+          in: query
+          description: Metadata on the most recent date of natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Most Recent Natural Color
+        - name: natural/date
+          in: query
+          description: Metadata for natural color imagery available for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: natural/all
+          in: query
+          description: A listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: natural/available
+          in: query
+          description: Alternate listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: enhanced
+          in: query
+          description: Metadata on the most recent date of enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Most Recent Enhanced Color
+        - name: enhanced/date
+          in: query
+          description: Metadata for enhanced color imagery for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: enhanced/all
+          in: query
+          description: A listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
+        - name: enhanced/available
+          in: query
+          description: Alternate listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: API key from api.nasa.gov for expanded usage.
           required: false
           schema:
             type: string
@@ -962,41 +898,84 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EPIC
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /EPIC/api/natural/date/{date}:
+      security:
+        - api_key: []
+  /EPIC/api/natural/date/2019-05-30:
     get:
       tags:
         - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
+      summary: EPIC - 2019-05-30
+      description: >-
+        The EPIC API provides information on the daily imagery collected by DSCOVR's Earth Polychromatic Imaging Camera
+        (EPIC) instrument. Uniquely positioned at the Earth-Sun Lagrange point, EPIC provides fu...
       parameters:
-        - name: date
-          in: path
-          description: The date parameter
-          required: true
+        - name: natural
+          in: query
+          description: Metadata on the most recent date of natural color imagery.
+          required: false
           schema:
             type: string
+            default: Most Recent Natural Color
+        - name: natural/date
+          in: query
+          description: Metadata for natural color imagery available for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: natural/all
+          in: query
+          description: A listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: natural/available
+          in: query
+          description: Alternate listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: enhanced
+          in: query
+          description: Metadata on the most recent date of enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Most Recent Enhanced Color
+        - name: enhanced/date
+          in: query
+          description: Metadata for enhanced color imagery for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: enhanced/all
+          in: query
+          description: A listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
+        - name: enhanced/available
+          in: query
+          description: Alternate listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: API key from api.nasa.gov for expanded usage.
           required: false
           schema:
             type: string
@@ -1008,35 +987,84 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EPIC
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /EPIC/api/natural/all:
     get:
       tags:
         - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
+      summary: EPIC - all
+      description: >-
+        The EPIC API provides information on the daily imagery collected by DSCOVR's Earth Polychromatic Imaging Camera
+        (EPIC) instrument. Uniquely positioned at the Earth-Sun Lagrange point, EPIC provides fu...
       parameters:
+        - name: natural
+          in: query
+          description: Metadata on the most recent date of natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Most Recent Natural Color
+        - name: natural/date
+          in: query
+          description: Metadata for natural color imagery available for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: natural/all
+          in: query
+          description: A listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: natural/available
+          in: query
+          description: Alternate listing of all dates with available natural color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Natural Color
+        - name: enhanced
+          in: query
+          description: Metadata on the most recent date of enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Most Recent Enhanced Color
+        - name: enhanced/date
+          in: query
+          description: Metadata for enhanced color imagery for a given date.
+          required: false
+          schema:
+            type: string
+            format: date
+            default: Most Recent Available
+        - name: enhanced/all
+          in: query
+          description: A listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
+        - name: enhanced/available
+          in: query
+          description: Alternate listing of all dates with available enhanced color imagery.
+          required: false
+          schema:
+            type: string
+            default: Dates for Enhanced Imagery
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: API key from api.nasa.gov for expanded usage.
           required: false
           schema:
             type: string
@@ -1048,157 +1076,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for EPIC
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /EPIC/api/enhanced:
-    get:
-      tags:
-        - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for EPIC
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /EPIC/api/enhanced/date/{date}:
-    get:
-      tags:
-        - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
-      parameters:
-        - name: date
-          in: path
-          description: The date parameter
-          required: true
-          schema:
-            type: string
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for EPIC
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /EPIC/api/enhanced/all:
-    get:
-      tags:
-        - EPIC
-      summary: EPIC endpoint
-      description: Access EPIC data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for EPIC
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /exoplanet/exoplanets:
     get:
       tags:
         - Exoplanet
-      summary: Exoplanet endpoint
-      description: Access Exoplanet data
+      summary: Exoplanet - exoplanets
+      description: >-
+        The Exoplanet Archive API allows programatic access to NASA's Exoplanet Archive database. This API contains a
+        ton of options so to get started please visit this page for introductory materials. To see...
       parameters:
         - name: api_key
           in: query
@@ -1214,31 +1107,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Exoplanet
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /exoplanet/exomultpars:
     get:
       tags:
         - Exoplanet
-      summary: Exoplanet endpoint
-      description: Access Exoplanet data
+      summary: Exoplanet - exomultpars
+      description: >-
+        The Exoplanet Archive API allows programatic access to NASA's Exoplanet Archive database. This API contains a
+        ton of options so to get started please visit this page for introductory materials. To see...
       parameters:
         - name: api_key
           in: query
@@ -1254,75 +1138,38 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Exoplanet
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /techtransfer:
-    get:
-      tags:
-        - TechTransfer
-      summary: TechTransfer endpoint
-      description: Access TechTransfer data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for TechTransfer
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /insight_weather/:
     get:
       tags:
         - Insight
-      summary: Insight endpoint
+      summary: Insight - API
       description: Access Insight data
       parameters:
+        - name: version
+          in: query
+          description: The version of this API
+          required: false
+          schema:
+            type: number
+            default: '1.0'
+        - name: feedtype
+          in: query
+          description: The format of what is returned. Currently the default is JSON and only JSON works.
+          required: false
+          schema:
+            type: string
+            default: json
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.data.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -1334,41 +1181,46 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Insight
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-photos/api/v1/rovers/{rover}/photos:
+      security:
+        - api_key: []
+  /mars-photos/api/v1/rovers/curiosity/photos:
     get:
       tags:
         - Mars Rover Photos
-      summary: Mars Rover Photos endpoint
-      description: Access Mars Rover Photos data
+      summary: Mars Rover Photos - photos
+      description: >-
+        This API is designed to collect image data gathered by NASA's Curiosity, Opportunity, and Spirit rovers on Mars
+        and make it more easily available to other developers, educators, and citizen scientists...
       parameters:
-        - name: rover
-          in: path
-          description: The rover parameter
-          required: true
+        - name: sol
+          in: query
+          description: sol (ranges from 0 to max found in endpoint)
+          required: false
+          schema:
+            type: integer
+        - name: camera
+          in: query
+          description: see table above for abbreviations
+          required: false
           schema:
             type: string
+            default: all
+        - name: page
+          in: query
+          description: 25 items per page returned
+          required: false
+          schema:
+            type: integer
+            default: '1'
         - name: api_key
           in: query
-          description: NASA API Key for expanded usage
+          description: api.nasa.gov key for expanded usage
           required: false
           schema:
             type: string
@@ -1380,116 +1232,39 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Mars Rover Photos
+                properties:
+                  photos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        sol:
+                          type: integer
+                        camera:
+                          type: object
+                        img_src:
+                          type: string
+                          format: uri
+                        earth_date:
+                          type: string
+                          format: date
+                        rover:
+                          type: object
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-photos/api/v1/rovers/{rover}/latest_photos:
-    get:
-      tags:
-        - Mars Rover Photos
-      summary: Mars Rover Photos endpoint
-      description: Access Mars Rover Photos data
-      parameters:
-        - name: rover
-          in: path
-          description: The rover parameter
-          required: true
-          schema:
-            type: string
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Mars Rover Photos
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-photos/api/v1/rovers:
-    get:
-      tags:
-        - Mars Rover Photos
-      summary: Mars Rover Photos endpoint
-      description: Access Mars Rover Photos data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Mars Rover Photos
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /search:
     get:
       tags:
         - NASA Image and Video Library
-      summary: NASA Image and Video Library endpoint
+      summary: NASA Image and Video Library - search
       description: Access NASA Image and Video Library data
       parameters:
         - name: api_key
@@ -1506,32 +1281,51 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for NASA Image and Video Library
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /sscweb/locations:
+      security:
+        - api_key: []
+  /techtransfer:
     get:
       tags:
-        - Satellite Situation Center
-      summary: Satellite Situation Center endpoint
-      description: Access Satellite Situation Center data
+        - TechTransfer
+      summary: TechTransfer - techtransfer
+      description: >-
+        NASA's Technology Transfer Program ensures that innovations developed for exploration and discovery are broadly
+        available to the public. The NASA patent portfolio is available to benefit US citizens. ...
       parameters:
+        - name: patent
+          in: query
+          description: Return a JSON of patents that match the string provided
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: patent_issued
+          in: query
+          description: Returns patent results in a JSON that match the string within the information about how issued each patent
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: software
+          in: query
+          description: Returns JSON of NASA software that matches given string.
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: Spinoff
+          in: query
+          description: Returns spinoff examples that match given word.
+          required: false
+          schema:
+            type: string
+            default: None
         - name: api_key
           in: query
           description: NASA API Key for expanded usage
@@ -1546,32 +1340,51 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Satellite Situation Center
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /sscweb/observatories:
+      security:
+        - api_key: []
+  /techtransfer/patent/:
     get:
       tags:
-        - Satellite Situation Center
-      summary: Satellite Situation Center endpoint
-      description: Access Satellite Situation Center data
+        - TechTransfer
+      summary: TechTransfer - API
+      description: >-
+        NASA's Technology Transfer Program ensures that innovations developed for exploration and discovery are broadly
+        available to the public. The NASA patent portfolio is available to benefit US citizens. ...
       parameters:
+        - name: patent
+          in: query
+          description: Return a JSON of patents that match the string provided
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: patent_issued
+          in: query
+          description: Returns patent results in a JSON that match the string within the information about how issued each patent
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: software
+          in: query
+          description: Returns JSON of NASA software that matches given string.
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: Spinoff
+          in: query
+          description: Returns spinoff examples that match given word.
+          required: false
+          schema:
+            type: string
+            default: None
         - name: api_key
           in: query
           description: NASA API Key for expanded usage
@@ -1586,32 +1399,49 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for Satellite Situation Center
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /ssd/fireball.api:
+      security:
+        - api_key: []
+  /techtransferQuery:
     get:
       tags:
-        - SSD/CNEOS
-      summary: SSD/CNEOS endpoint
-      description: Access SSD/CNEOS data
+        - TechTransfer
+      summary: TechTransfer - techtransferQuery
+      description: Access TechTransfer data
       parameters:
+        - name: patent
+          in: query
+          description: Return a JSON of patents that match the string provided
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: patent_issued
+          in: query
+          description: Returns patent results in a JSON that match the string within the information about how issued each patent
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: software
+          in: query
+          description: Returns JSON of NASA software that matches given string.
+          required: false
+          schema:
+            type: string
+            default: None
+        - name: Spinoff
+          in: query
+          description: Returns spinoff examples that match given word.
+          required: false
+          schema:
+            type: string
+            default: None
         - name: api_key
           in: query
           description: NASA API Key for expanded usage
@@ -1626,65 +1456,14 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for SSD/CNEOS
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /ssd/sbdb_query.api:
-    get:
-      tags:
-        - SSD/CNEOS
-      summary: SSD/CNEOS endpoint
-      description: Access SSD/CNEOS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for SSD/CNEOS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /api:
     get:
       summary: GET /api
@@ -1771,12 +1550,14 @@ paths:
     get:
       tags:
         - TLE API
-      summary: TLE API endpoint
-      description: Access TLE API data
+      summary: TLE API - {satellite_id}
+      description: >-
+        The TLE API provides up to date two line element set records, the data is updated daily from CelesTrak and
+        served in JSON format. A two-line element set (TLE) is a data format encoding a list of orbit...
       parameters:
         - name: satellite_id
           in: path
-          description: The satellite_id parameter
+          description: The unique identifier for the satellite resource
           required: true
           schema:
             type: string
@@ -1794,31 +1575,22 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for TLE API
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
   /tle:
     get:
       tags:
         - TLE API
-      summary: TLE API endpoint
-      description: Access TLE API data
+      summary: TLE API - tle
+      description: >-
+        The TLE API provides up to date two line element set records, the data is updated daily from CelesTrak and
+        served in JSON format. A two-line element set (TLE) is a data format encoding a list of orbit...
       parameters:
         - name: api_key
           in: query
@@ -1834,1265 +1606,14 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Response data for TLE API
         '400':
           description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '403':
           description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '429':
           description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/curiosity_ctx_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/curiosity_hirise_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/ESP_040776_2115_RED_A_01_ORTHO/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/ESP_042252_1930_RED_B_01_ORTHO/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/ESP_042647_1760_RED_B_01_ORTHO/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/HRSC_Martian_east/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/MC11E_HRMOSCO_COL/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/MC11E_HRMOSND_ND5/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/spirit_hirise_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/opportunity_hirise_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/phoenix_hirise_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/sojourner_hirise_mosaic/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_MGS_TES_Albedo_mosaic_global_7410m/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_MGS_MOLA_DEM_mosaic_global_463m_8/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/mars_pahrump_patch_8k_256m/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/msss_atlas_simp_clon/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_MO_THEMIS-IR-Night_mosaic_60N60S_100m_v14_clon0_ly/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/Mars_MO_THEMIS-IR-Day_mosaic_global_100m_v12_clon0_ly/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/hrsc_mawrth_vallis/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /mars-wmts/catalog/hrsc_mawrth_vallis_color/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/global_LAMO/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_HAMO_DTM_DLR_Global_48ppd8/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_Geology_Global_32ppd_IAU/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_HAMO_ClrShade_DLR_Global_48ppd_IAU/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_HAMO_MinRatio_DLR_global_74ppd_IAU/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_HAMO_Shade_DLR_Global_48ppd_IAU/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /vesta-wmts/catalog/Vesta_Dawn_HAMO_TrueClr_DLR_global_74ppd/1.0.0/WMTSCapabilities.xml:
-    get:
-      tags:
-        - Vesta/Moon/Mars Trek WMTS
-      summary: Vesta/Moon/Mars Trek WMTS endpoint
-      description: Access Vesta/Moon/Mars Trek WMTS data
-      parameters:
-        - name: api_key
-          in: query
-          description: NASA API Key for expanded usage
-          required: false
-          schema:
-            type: string
-            default: DEMO_KEY
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                description: Response data for Vesta/Moon/Mars Trek WMTS
-        '400':
-          description: Bad request - invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '403':
-          description: Forbidden - invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          description: Too many requests - rate limit exceeded
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      security:
+        - api_key: []
 components:
   securitySchemes:
     api_key:
