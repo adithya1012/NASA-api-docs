@@ -179,10 +179,16 @@ a:focus {
 /* The alert message box */
 .alert {
   padding: 20px;
-  background-color: #ff9800; /* Orange */
+  border-left: .5rem solid;
+  background-color: #FAF3D0; /* yellow */
+  border-left-color: #ffbe2e;
   color: black;
   margin-bottom: 15px;
 }
+.alert.a{
+
+}
+
 
 /* The close button */
 .closebtn {
